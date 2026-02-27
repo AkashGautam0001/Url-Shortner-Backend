@@ -9,6 +9,7 @@ type ServerConfig = {
   REDIS_HOST: string;
   REDIS_PORT: number;
   REDIS_COUNTER_KEY: string;
+  BASE_URL: string;
 };
 
 export function loadEnv() {
@@ -26,4 +27,5 @@ export const serverConfig: ServerConfig = {
   REDIS_HOST: process.env.REDIS_HOST || "localhost",
   REDIS_PORT: Number(process.env.REDIS_PORT) || 6379,
   REDIS_COUNTER_KEY: process.env.REDIS_COUNTER_KEY || "counter",
+  BASE_URL: process.env.BASE_URL || "http://localhost:3001",
 };
