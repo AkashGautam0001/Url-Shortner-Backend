@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from "redis";
+import logger from "./logger.config.js";
 import { serverConfig } from "./index.js";
 
 let redisClient: RedisClientType | null = null;
@@ -13,33 +14,31 @@ export const initRedis = async (): Promise<RedisClientType> => {
   }
 
   redisClient = createClient({
-    url: serverConfig.REDIS_URI,
+    username: serverConfig.REDIS_USERNAME,
+    password: serverConfig.REDIS_PASSWORD,
     socket: {
-      reconnectStrategy: (retries) => {
-        console.log(`Redis reconnect attempt: ${retries}`);
-        return Math.min(retries * 100, 3000);
-      },
-    },
+        host: serverConfig.REDIS_HOST,
+        port: serverConfig.REDIS_PORT
+    }
   });
 
   redisClient.on("connect", () => {
-    console.log("✅ Redis Client Connected");
+    logger.info("✅ Redis Client Connected");
   });
 
   redisClient.on("ready", () => {
-    console.log("🚀 Redis Client Ready");
+    logger.info("🚀 Redis Client Ready");
   });
 
   redisClient.on("error", (err) => {
-    console.error("❌ Redis Client Error:", err);
+    logger.error("❌ Redis Client Error:", err);
   });
 
   redisClient.on("end", () => {
-    console.log("🔌 Redis Connection Closed");
+    logger.info("🔌 Redis Connection Closed");
   });
 
   await redisClient.connect();
-  console.log("🔥 Connected to Redis successfully");
 
   return redisClient;
 };
@@ -60,6 +59,6 @@ export const getRedisClient = (): RedisClientType => {
 export const closeRedis = async (): Promise<void> => {
   if (redisClient && redisClient.isOpen) {
     await redisClient.quit();
-    console.log("🛑 Redis disconnected gracefully");
+    logger.info("🛑 Redis disconnected gracefully");
   }
 };
